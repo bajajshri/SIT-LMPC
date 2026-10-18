@@ -2,25 +2,38 @@
 name = "sit-lmpc"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "zzangupenn",email = "zzang@seas.upenn.edu"}
-]
-readme = "README.md"
+authors = [{ name = "zzangupenn", email = "zzang@seas.upenn.edu" }]
 requires-python = ">=3.12"
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
 dependencies = [
     "jax[cuda12] (>=0.6.2,<0.7.0)",
     "matplotlib (>=3.10.3,<4.0.0)",
     "opencv-python (>=4.11.0.86,<5.0.0.0)",
-    "pyqt6 (>=6.9.1,<7.0.0)",
+    "pyqt6 (>=6.9.0,<7.0.0)",
     "flax (>=0.10.6,<0.11.0)",
     "optax (>=0.2.5,<0.3.0)",
     "distrax (>=0.1.5,<0.2.0)",
     "pynput (>=1.7.6,<2.0.0)",
     "tqdm (>=4.67.1,<5.0.0)",
     "colorama (>=0.4.6,<0.5.0)",
+    "utilsuite",
+    "f1tenth-gym",
 ]
 
-
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "sit_lmpc"
+
+[tool.uv.sources]
+utilsuite = { git = "https://github.com/zzangupenn/utilitySuite.git", rev = "16e75ab511f91bf82a8002c72cd899d4331de12b" }
+f1tenth-gym = { git = "https://github.com/zzangupenn/f1tenth_gym.git", rev = "b10e0fe3953dd89c3b376110b5ee94c49e044b0b" }
