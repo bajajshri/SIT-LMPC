@@ -22,6 +22,11 @@ from sit_lmpc.utils.track_jax import Track
 from sit_lmpc.utils.mppi_renderers import MPPIRenderers
 from sit_lmpc.learned_dyna_model import dynaConfig, get_dyna_train_data
 from f1tenth_gym.envs.f110_env import F110Env
+from sit_lmpc.utils.car_sprite import install_car_sprite, reset_gl_caches
+from sit_lmpc.utils.track_texture import add_textured_track
+
+
+install_car_sprite()
 
 def main():
 
@@ -29,7 +34,7 @@ def main():
     init_run_id = 0
     min_laptimes = []
     max_laps = []
-    experiment_maps = [1]
+    experiment_maps = [3]
     for map_ind in experiment_maps:
         test_ind = init_run_id
         while test_ind < test_times + init_run_id:
@@ -59,7 +64,7 @@ def main():
             config.cartesian_models = ['dynamic_ST', 'kinematic_ST', 'nn_dynamic_ST']
             config.load_pretrained_dynamic_model = 1
             config.friction = 1.0
-            config.init_vel = 10
+            config.init_vel = 6
             config.n_steps = 10
             config.control_sample_std = [0.25, 0.25]
             config.random_seed = np.random.randint(0, 1e6)
@@ -108,6 +113,7 @@ def main():
     
 
 def run_experiment(config, value_config, dyna_config):
+    
     us, logline = utilsuite.utilitySuite(config)
     logline('exp_name', config.exp_name)
     logline('random seed', config.random_seed)
@@ -145,7 +151,7 @@ def run_experiment(config, value_config, dyna_config):
     frenet_start = np.array(env.unwrapped.track.frenet_to_cartesian(0.0, 0, 0))
     init_state = np.array([[frenet_start[0], frenet_start[1], 0, config.init_vel, 0, 0, 0]])
     obs, info = env.reset(options={'states':init_state})   
-    
+    reset_gl_caches()
     plottings = Plottings(track, config, us, enable=config.plottings)
     infer_env = InferEnv(track, config, DT=config.sim_time_step, params_dict=dynamic_params, dyna_config=dyna_config)
     mppi = MPPI(config, infer_env, jrng, track.raceline.waypoints)
@@ -200,7 +206,8 @@ def run_experiment(config, value_config, dyna_config):
         
     if config.render:
         mppi_renderers = MPPIRenderers(env.unwrapped.renderer, track, config)
-        mppi_renderers.set_track_renderer(max_points=200, boundary_color=us.colorpal.rgb('o'), centerline_color=(50, 50, 50), z_offset=0.01)
+        #mppi_renderers.set_track_renderer(max_points=200, boundary_color=us.colorpal.rgb('o'), centerline_color=(50, 50, 50), z_offset=0.01)
+        add_textured_track(env.unwrapped.renderer, track, config.half_width)
         ref_renderer = mppi_renderers.get_point_renderer(np.array([0, 0]), color=us.colorpal.rgb('pi'), size=10, z_offset=0.02)
         # sampled_renderer = mppi_renderers.get_point_renderer(np.array([0, 0]), color=us.colorpal.rgb('g'), size=5, z_offset=0.02)
         opt_traj_renderer = mppi_renderers.get_point_renderer(np.array([0, 0]), color=us.colorpal.rgb('y'), size=10, z_offset=0.04)
